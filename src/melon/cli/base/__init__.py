@@ -112,7 +112,7 @@ class BaseCommandProcessor[PARAMS: "BaseParameters"](ABC):
 
 		if parser_name not in self._internal_storage.source_operators:
 			source_operator = parser_operator.launch()
-			if self._internal_storage.mirror: source_operator.set_mirror(self._mirror)
+			if self._internal_storage.mirror: source_operator.set_mirror(self._internal_storage.mirror)
 			self._internal_storage.source_operators[parser_name] = source_operator
 			return source_operator
 
