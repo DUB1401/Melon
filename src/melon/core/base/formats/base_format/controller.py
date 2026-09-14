@@ -5,7 +5,7 @@ from abc import ABC, abstractmethod
 from json import JSONDecodeError
 from os import PathLike
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import orjson
 
@@ -60,7 +60,7 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 	def is_local_file_loaded(self) -> bool:
 		"""Состояние: считывались ли данные из локального файла."""
 
-		return self._is_local_file_loaded
+		return bool(self._local_file_path)
 
 	@property
 	def parser(self) -> "BaseParser":
@@ -91,7 +91,10 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 
 		Filename: str = filename if filename.endswith(".json") else f"{filename}.json"
 		FilePath = self._parser.settings.directories.titles / Filename
-		if FilePath.exists(): return json.read(FilePath)
+
+		if FilePath.exists():
+			self._local_file_path = FilePath
+			return json.read(FilePath)
 
 		return None
 
@@ -165,7 +168,7 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 
 		return zerotify(DataBuffer)
 
-	def _search_file_in_directory(self, directory: str | PathLike[str], identificator: int | str, identificator_type: By) -> dict | None:
+	def _search_file_in_directory(self, directory: str | PathLike[str], identificator: int | str, identificator_type: Literal[By.ID, By.Slug]) -> dict | None:
 		"""
 		Находит файл JSON в директории по идентификатору определённого типа.
 
@@ -173,8 +176,8 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 		:type directory: str | PathLike[str]
 		:param identificator: Идентификатор: ID или алиас.
 		:type identificator: int | str
-		:param identificator_type: Тип идентификатора: `By.Slug` или `By.ID`.
-		:type identificator_type: By
+		:param identificator_type: Тип идентификатора.
+		:type identificator_type: Literal[By.ID, By.Slug]
 		:return: Содержимое файла или `None` при отсутствии оного или ошибке.
 		:rtype: dict | None
 		"""
@@ -184,7 +187,9 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 
 			try: 
 				Data = json.read(Element.path)
-				if Data.get(identificator_type.value) == identificator: return Data
+				if Data.get(identificator_type.value) == identificator:
+					self._local_file_path = Path(Element.path)
+					return Data
 
 			except (JSONDecodeError, exceptions.parsers.UnsupportedFormat): pass
 
@@ -302,10 +307,10 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 		return local_hash.hexdigest() == memore_hash.hexdigest()
 
 	def _update_journal(self):
-		"""Обновляет кэш пары алиас-ID, если оба валидны."""
+		"""Обновляет кэш пары алиас-ID."""
 
 		if self._data.id:
-			self._parser.source_operator.shared_data.journal.update(self._data.id, self._slug)
+			self._parser.source_operator.shared_data.journal.update(self._data.id, self._data.slug)
 
 	#==========================================================================================#
 	# >>>>> ПЕРЕОПРЕДЕЛЯЕМЫЕ МЕТОДЫ <<<<< #
@@ -343,7 +348,7 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 		self._data.set_domain(self._parser.manifest.domain)
 		self._data.set_slug(self._slug)
 
-		self._is_local_file_loaded: bool = False
+		self._local_file_path: Path | None = None
 
 		self._post_init()
 
@@ -462,14 +467,29 @@ class BaseTitleController[TD: "BaseTitleData"](ABC):
 		"""
 
 		data: dict[str, Any] = self._data.to_dict(sorting)
+
 		is_local_file_equal: bool = self._is_local_file_equal(data)
-		
+		is_slug_changed: bool = False
+		is_local_file_renamed: bool = False
+
+		if self._data.slug != self._slug:
+			is_slug_changed = True
+
 		if not is_local_file_equal:
 			json.write(self.path, data)
+
+		if not self._parser.settings.common.use_id_as_filename and is_slug_changed:
+			original_path = self.path
+			new_path = original_path.with_stem(self._data.slug)
+			original_path.rename(new_path)
+			self._slug = self._data.slug
+			is_local_file_renamed = True
 
 		self._update_journal()
 
 		return SavingResult(
 			is_saved = not is_local_file_equal,
+			is_slug_changed = is_slug_changed,
+			is_local_file_renamed = is_local_file_renamed,
 			unused_images_removed = self._clear_unused_images()
 		)

@@ -80,8 +80,14 @@ class ParsingTemplates(_BaseTemplatesSection):
 		:type result: SavingResult
 		"""
 
+		if result.is_slug_changed:
+			self.printer.emit("Title slug changed.")
+
 		if result.is_saved: self.printer.emit("Saved.")
 		else: self.printer.emit("No changes. Saving skipped.")
+
+		if result.is_local_file_renamed:
+			self.printer.emit("File renamed by new slug.")
 
 		if result.unused_images_removed:
 			self.printer.emit(f"Removed {result.unused_images_removed} unused images.")

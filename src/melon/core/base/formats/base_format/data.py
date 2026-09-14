@@ -822,12 +822,6 @@ class BaseTitleData[C: "BaseChapter"](ABC):
 		if slug == self.slug:
 			return
 
-		if not self._title_controller.parser.settings.common.use_id_as_filename:
-			CurrentPath = self._title_controller.path
-			if CurrentPath.exists():
-				NewPath = CurrentPath.with_stem(slug)
-				CurrentPath.rename(NewPath)
-
 		self._data["slug"] = slug
 
 	def set_status(self, status: Statuses | None):

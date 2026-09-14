@@ -25,4 +25,6 @@ class SavingResult:
 	"""Результат сохранения тайтла."""
 
 	is_saved: bool
+	is_slug_changed: bool
+	is_local_file_renamed: bool
 	unused_images_removed: int
