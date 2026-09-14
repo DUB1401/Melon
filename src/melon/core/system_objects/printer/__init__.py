@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING
+import sys
+from typing import TYPE_CHECKING, Literal, NoReturn, overload
 
 import orjson
 
@@ -58,7 +59,7 @@ class Printer:
 		self.__ProgressIndicator = ProgressIndicator()
 		self.__Templates = Templates(self)
 
-	def emit(self, text: str, message_type: MessagesTypes | None = None, end_line: bool = True, flush: bool = False, parse_html: bool = True):
+	def emit(self, text: str, message_type: MessagesTypes | None = None, origin: str | None = None, end_line: bool = True, flush: bool = False, parse_html: bool = True):
 		"""
 		Отправляет сообщение в поток вывода.
 
@@ -66,6 +67,8 @@ class Printer:
 		:type text: str
 		:param message_type: Тип сообщения.
 		:type message_type: MessagesTypes | None
+		:param origin: Источник сообщения.
+		:type origin: str | None
 		:param end_line: Указывает, нужно ли добавить в конец строки символ новой строки.
 		:type end_line: bool
 		:param flush: Переключает вывод кэшированных данных.
@@ -75,7 +78,7 @@ class Printer:
 		"""
 
 		if parse_html: text = get_styled_text_from_html(text)
-		MessageText = GenerateMessage(text, message_type)
+		MessageText = GenerateMessage(text, message_type, origin)
 		print(MessageText, end = "\n" if end_line else "", flush = flush)
 
 	def get_parser_portals(self, parser_name: str) -> Portals:
@@ -94,36 +97,50 @@ class Printer:
 	# >>>>> ШАБЛОНЫ ВЫВОДА БАЗОВЫХ ТИПОВ СООБЩЕНИЙ <<<<< #
 	#==========================================================================================#
 
-	def critical(self, text: str):
+	@overload
+	def critical(self, text: str, origin: str | None = None, end_work: Literal[True] = ...) -> NoReturn: ...
+	@overload
+	def critical(self, text: str, origin: str | None = None, end_work: Literal[False] = False): ...
+
+	def critical(self, text: str, origin: str | None = None, end_work: bool = False):
 		"""
 		Выводит в терминал критическую ошибку.
 
 		:param text: Текст сообщения.
 		:type text: str
+		:param origin: Источник сообщения.
+		:type origin: str | None
+		:param end_work: Указывает, нужно ли завершить работу скрипта при обработке ошибки.
+		:type end_work: bool
 		"""
 
-		self.emit(text, MessagesTypes.Critical)
+		self.emit(text, MessagesTypes.Critical, origin)
+		if end_work: sys.exit(1)
 
-	def debug(self, text: str):
+	def debug(self, text: str, origin: str | None = None):
 		"""
 		Выводит в терминал сообщение отладки.
 
 		:param text: Текст сообщения.
 		:type text: str
+		:param origin: Источник сообщения.
+		:type origin: str | None
 		"""
 
 		if self.__SystemObjects.options.DEBUG:
-			self.emit(text, MessagesTypes.Debug)
+			self.emit(text, MessagesTypes.Debug, origin)
 
-	def error(self, text: str):
+	def error(self, text: str, origin: str | None = None):
 		"""
 		Выводит в терминал ошибку.
 
 		:param text: Текст сообщения.
 		:type text: str
+		:param origin: Источник сообщения.
+		:type origin: str | None
 		"""
 
-		self.emit(text, MessagesTypes.Error)
+		self.emit(text, MessagesTypes.Error, origin)
 
 	def json(self, data: dict):
 		"""
@@ -135,12 +152,14 @@ class Printer:
 
 		self.emit(orjson.dumps(data).decode())
 
-	def warning(self, text: str):
+	def warning(self, text: str, origin: str | None = None):
 		"""
 		Выводит в терминал предупреждения.
 
 		:param text: Текст сообщения.
 		:type text: str
+		:param origin: Источник сообщения.
+		:type origin: str | None
 		"""
 
-		self.emit(text, MessagesTypes.Warning)
+		self.emit(text, MessagesTypes.Warning, origin)

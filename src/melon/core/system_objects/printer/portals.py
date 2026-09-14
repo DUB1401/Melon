@@ -45,6 +45,11 @@ class Portals:
 	# >>>>> ШАБЛОНЫ ОШИБОК <<<<< #
 	#==========================================================================================#
 
+	@overload
+	def authorization_required(self, text: str | None = None, exception: Literal[True] = True) -> NoReturn: ...
+	@overload
+	def authorization_required(self, text: str | None = None, exception: Literal[False] = ...): ...
+
 	def authorization_required(self, text: str | None = None, exception: bool = True):
 		"""
 		Портал ошибки: требуется авторизация.
@@ -66,9 +71,8 @@ class Portals:
 
 	@overload
 	def request_error(self, response: WebResponse, text: str | None = None, exception: Literal[True] = True) -> NoReturn: ...
-
 	@overload
-	def request_error(self, response: WebResponse, text: str | None = None, exception: Literal[False] = False): ...
+	def request_error(self, response: WebResponse, text: str | None = None, exception: Literal[False] = ...): ...
 
 	def request_error(self, response: WebResponse, text: str | None = None, exception: bool = True):
 		"""
