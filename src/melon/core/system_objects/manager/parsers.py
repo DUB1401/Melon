@@ -54,10 +54,12 @@ class ParserOperator:
 	def extensions_names(self) -> tuple[str, ...]:
 		"""Последовательность имён расширений парсера."""
 
-		ExtensionsDirectory: Path = self.__Parsers.root / f"{self.__Name}/extensions"
-		if not ExtensionsDirectory.exists(): return ()
+		extensions_directory: Path = self.__Parsers.root / f"{self.__Name}/extensions"
 
-		return tuple(sorted(Entry.name for Entry in os.scandir(ExtensionsDirectory) if Entry.is_dir()))
+		if not extensions_directory.exists():
+			return ()
+
+		return tuple(sorted(entry.name for entry in os.scandir(extensions_directory) if entry.is_dir() and not entry.name.startswith("__")))
 
 	@property
 	def is_installed(self) -> bool:
