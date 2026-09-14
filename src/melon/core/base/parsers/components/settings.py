@@ -444,6 +444,7 @@ class Extensions:
 		:type container: type
 		:return: Контейнер с опциями расширения.
 		:rtype: BaseExtensionOptions
+		:raises pydantic_core._pydantic_core.ValidationError: Неверный набор параметров расширения.
 		"""
 		
 		return TypeAdapter(container).validate_python(self.__extensions_settings[extension_name])

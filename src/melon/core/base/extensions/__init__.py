@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
+from pydantic_core import ValidationError
+
 from .options import BaseExtensionOptions
 
 if TYPE_CHECKING:
@@ -70,6 +72,32 @@ class BaseExtension[SO: "BaseSourceOperator", CSM: "CustomSettingsTemplate", EO:
 		return self._temp_directory
 
 	#==========================================================================================#
+	# >>>>> НАСЛЕДУЕМЫЕ МЕТОДЫ <<<<< #
+	#==========================================================================================#
+
+	def _parse_options(self) -> EO:
+		"""
+		Парсит настройки расширения.
+
+		В случае ошибоки валидации словаря настроек выводит подробности в терминал и завершает работу.
+
+		:return: Настройки расширения.
+		:rtype: EO
+		"""
+
+		try:
+			return self.parser_settings.extensions.get(self._name, self._export_options_model())
+
+		except ValidationError as exception:
+
+			for error in exception.errors():
+				error_type: str = error["type"].lower()
+				field: str = "/".join(str(key) for key in error["loc"])
+				self.portals.printer.error(f"Field <b>{field}</b> error: <i>{error_type}</i>.", origin = self._name)
+
+			self.portals.printer.critical("Unable parse extension options.", end_work = True)
+
+	#==========================================================================================#
 	# >>>>> ПЕРЕОПРЕДЕЛЯЕМЫЕ МЕТОДЫ <<<<< #
 	#==========================================================================================#
 
@@ -107,7 +135,7 @@ class BaseExtension[SO: "BaseSourceOperator", CSM: "CustomSettingsTemplate", EO:
 		self._source_operator: SO = source_operator
 		self._name: str = self.__module__.split(".")[-1]
 		
-		self._options: EO = self.parser_settings.extensions.get(self._name, self._export_options_model())
+		self._options: EO = self._parse_options()
 		self._temp_directory: "Path" = self._source_operator.system_objects.temper.get_extension_temp_directory(self._source_operator.parser_name, self._name)
 
 		self._post_init()

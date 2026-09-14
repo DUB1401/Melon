@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
 	"beautifulsoup4",
 	"deepmerge",
-	"dublib==0.30.2",
+	"dublib>=0.30.3",
 	"dulwich>=1.2.6",
 	"EbookLib",
 	"imagehash",
