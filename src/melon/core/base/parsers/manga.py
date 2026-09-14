@@ -66,15 +66,16 @@ class BaseMangaParser[SO: "BaseSourceOperator", CSM: "CustomSettingsTemplate"](B
 		:rtype: bool
 		"""
 
-		Title = cast("Manga", self._title)
+		title = cast("Manga", self._title)
 
-		SearchResult = Title.data.find_chapter(chapter_id)
+		search_result = title.data.find_chapter(chapter_id)
 
-		if not SearchResult:
+		if not search_result:
 			raise exceptions.parsing.ChapterNotFound(chapter_id)
 
-		AmendedChapter = cast("Chapter", SearchResult.chapter)
-		AmendedChapter.clear()
-		self._amend(SearchResult.branch, AmendedChapter)
+		chapter = cast("Chapter", search_result.chapter)
+		chapter.clear()
 		
-		return bool(AmendedChapter.slides)
+		self._amend(search_result.branch, chapter)
+		
+		return bool(chapter.slides)

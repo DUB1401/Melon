@@ -104,15 +104,15 @@ class CommandProcessor(CommandProcessorTemplate[Parameters]):
 			self.printer.error("For now only chapters supported as target to repairing.")
 			return False
 	
-		TypingResult = source_operator.get_content_type_by_file(parameters.filename)
+		typing_result = source_operator.get_content_type_by_file(parameters.filename)
 
-		if not TypingResult.slug:
+		if not typing_result.slug:
 			raise exceptions.parsing.ParsingError("Undefined title slug.")
 
-		Parser = source_operator.launch_parser(TypingResult.content_type)
-		Title = Parser.init_empty_title(TypingResult.slug)
+		parser = source_operator.launch_parser(typing_result.content_type)
+		title = parser.init_empty_title(typing_result.slug)
 	
-		if Title.load(parameters.filename, By.Filename):
+		if title.load(parameters.filename, By.Filename):
 			self.printer.emit(f"Loaded file: <i>{parameters.filename}</i>.")
 		else:
 			self.printer.error(f"Unable load file: <b>{parameters.filename}</b>.")
@@ -120,9 +120,10 @@ class CommandProcessor(CommandProcessorTemplate[Parameters]):
 	
 		self.printer.emit(f"Repairing chapter <b>{parameters.target_id}</b>… ")
 	
-		if not Parser.repair(parameters.target_id): self.printer.warning("Chapter is empty. Repairing failure?")
-	
-		if Parser.save(): self.printer.emit("Saved.")
-		else: self.printer.emit("No changes. Saving skipped.")
+		if not parser.repair(parameters.target_id):
+			self.printer.warning("Chapter is empty. Repairing failure?")
+
+		saving_result = parser.save()
+		self.printer.templates.parsing.saving_result(saving_result)
 
 		return True

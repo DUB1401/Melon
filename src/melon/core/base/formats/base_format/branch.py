@@ -156,9 +156,5 @@ class Branch(ABC):
 	def to_list(self) -> list[dict]:
 		"""Возвращает список словарей данных глав, принадлежащих текущей ветви."""
 
-		BranchList = []
-		for CurrentChapter in self._Chapters.values():
-			BranchList.append(CurrentChapter.to_dict())
-
-		return BranchList
+		return [chapter.to_dict() for chapter in self._Chapters.values()]
 	

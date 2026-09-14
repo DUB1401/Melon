@@ -223,10 +223,10 @@ class BaseTitleData[C: "BaseChapter"](ABC):
 		:type sorting: bool
 		"""
 
-		for CurrentBranch in self._branches.values():
-			if brach_id and brach_id == CurrentBranch.id or not brach_id:
-				if sorting: CurrentBranch.sort()
-				self._data["content"][str(CurrentBranch.id)] = CurrentBranch.to_list()
+		for branch in self._branches.values():
+			if brach_id and brach_id == branch.id or not brach_id:
+				if sorting: branch.sort()
+				self._data["content"][str(branch.id)] = branch.to_list()
 				if brach_id: break
 
 	def _build_covers(self):
