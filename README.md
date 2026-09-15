@@ -1,41 +1,51 @@
 # Melon
-**Melon** – это модульная система управления парсерами манги и ранобэ, способная получать информацию о тайтлах, сохранять её в формате JSON, запрашивать обновления и собирать контент в удобный для ознакомления формат.
+
+![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)
+![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)
+![Python version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fotaku-melons%2Fmelon%2Frefs%2Fheads%2Fmain%2Fpyproject.toml
+)
+
+Management system for manga and ranobe parsers modules capable of retrieving titles information, saving it in JSON, requesting updates and compiling content into an easy-to-read format.
+
 <p align="center">
 	<img src="icon.svg" width=25% height=25% allign="center">
 </p>
 
-_Мы уважаем труд организаций, предоставляющих контент, и потому не поставляем никаких решений, связанных с нелегальным получением доступа к платному контенту, а также для снижения нагрузки на эти ресурсы задаём небольшую задержку между запросами._
+We welcome all developers and enthusiasts!
 
-## Порядок установки и использования
-1. Для установки необходимо наличие [Python](https://www.python.org) версии **3.12** или новее на вашем устройстве. Создайте вирутальное окружение Python, после чего активируйте его и установите Melon.
-```Bash
-python3 -V
-python3 -m venv .venv
-source .venv/bin/activate
-pip install git+https://github.com/otaku-melons/melon
-```
-2. После этого вы сможете использовать Melon внутри виртуального окружения, не захламляющего вашу систему пакетами.
-```Bash
-melon help && pxm help && urun help
-```
-3. Добавьте Git-репозиторий для необходимого парсера.
-```Bash
-pxm repos --add https://github.com/otaku-melons/{PARSER}
-```
-4. Установите парсер, при необходимости настройте его файл конфигурации в директории `configs` используя [инструкцию](#настройки-парсеров) ниже.
-```Bash
-pxm install {PARSER}
-```
-4. Соберите описательный JSON-файл установленным парсером.
-```Bash
-melon parse {SLUG} --use {PARSER}
-```
-5. Постройте готовый для ознакомления контент из описательного файла.
-```Bash
-melon build-manga {FILE} --use {PARSER} -cbz
-```
+Documentation available in [this](https://github.com/otaku-melons/docs) repository and see our [roadmap](https://github.com/orgs/otaku-melons/projects/1/views/1) for information about development progress.
 
 > [!NOTE]  
-> Melon не проходит тестирование на Windows или MacOS, поскольку эти ОС не являются целевыми платформами, но теоретически полностью работоспособен на них. Мы всегда рады обратной связи.
+> _We respect the intellectual property of content providers and do not provide any solutions designed to bypass paywalls or illegally access premium content. To minimize the load on these resources, a brief delay is enforced between requests._
+
+## Getting started
+1. Install [uv](https://docs.astral.sh/uv/) project manager on your system.
+2. Create virtual enviroment and install Melon.
+```
+uv venv
+uv pip install git+https://github.com/otaku-melons/melon
+uv venv .venv --prompt melon
+```
+3. Activate virtual enviroment and run Melon.
+```Bash
+source .venv/bin/activated
+melon help && pxm help && urun help
+```
+4. Add Git-repository of parser.
+```
+pxm remotes add https://github.com/otaku-melons/{PARSER}
+```
+5. Install parser and configure it by editing settings file in configs directory.
+```
+pxm install {PARSER}
+```
+6. Parse title for creation descriptive JSON file in output directory.
+```
+melon parse {SLUG} --use {PARSER}
+```
+6. Build read-ready content from descriptive JSON file.
+```Bash
+melon build manga {FILE} --use {PARSER} -cbz
+```
 
 _Copyright © DUB1401. 2024-2026._

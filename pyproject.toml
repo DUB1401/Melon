@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "melon"
-version = "1.0.0-rc.5"
+version = "1.0.0-rc.6"
 description = "Modular parsers management system."
 readme = "README.md"
 authors = [
@@ -38,12 +38,13 @@ ignore = ["C901", "E701", "E501"]
 
 [tool.ruff.lint.isort]
 lines-after-imports = 1
-sections = {"dublib" = ["dublib"]}
+sections = {"dublib" = ["dublib"], "melon" = ["melon"]}
 section-order = [
 	"future",
 	"standard-library",
 	"third-party",
 	"dublib",
+	"melon",
 	"first-party",
 	"local-folder"
 ]
