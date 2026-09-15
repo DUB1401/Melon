@@ -2,6 +2,7 @@
 
 ![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)
 ![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)
+![Typed](https://img.shields.io/badge/types-typed-brightgreen)
 ![Python version](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fotaku-melons%2Fmelon%2Frefs%2Fheads%2Fmain%2Fpyproject.toml
 )
 
@@ -43,7 +44,7 @@ pxm install {PARSER}
 ```
 melon parse {SLUG} --use {PARSER}
 ```
-6. Build read-ready content from descriptive JSON file.
+7. Build read-ready content from descriptive JSON file.
 ```Bash
 melon build manga {FILE} --use {PARSER} -cbz
 ```
