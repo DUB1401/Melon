@@ -5,8 +5,7 @@ from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from deepmerge import always_merger
-
+from dublib.functions.data import dictionary
 from dublib.functions.decorators import run_before_method
 from dublib.functions.filesystem import json
 
@@ -138,7 +137,7 @@ class ParserOperator:
 
 		if PresetFile.exists():
 			Buffer: dict = json.read(PresetFile)
-			Config = always_merger.merge(BaseConfig, Buffer)
+			Config = dictionary.deep_merge(BaseConfig, Buffer, uniqueness = True)
 		else:
 			return ExportResults.Missing
 
@@ -154,7 +153,7 @@ class ParserOperator:
 
 				case ExportStrategies.Merge:
 					CurrentConfig: dict = json.read(StorageFile)
-					Config = always_merger.merge(Config, CurrentConfig)
+					Config = dictionary.deep_merge(Config, CurrentConfig, uniqueness = True)
 					json.write(StorageFile, Config)
 					return ExportResults.Merged
 

@@ -3,11 +3,10 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, Literal
 
-from deepmerge import always_merger
 from pydantic import TypeAdapter
 from pydantic.dataclasses import dataclass
 
-from dublib.functions.data import zerotify
+from dublib.functions.data import dictionary, zerotify
 from dublib.functions.filesystem import json
 from dublib.web_requestor import Proxy
 
@@ -520,7 +519,7 @@ class ParserSettings[T: CustomSettingsTemplate]:
 		for ConfigPath in ConfigsPaths:
 			if ConfigPath.exists():
 				Buffer: dict = json.read(ConfigPath)
-				Settings = always_merger.merge(Settings, Buffer)
+				Settings = dictionary.deep_merge(Settings, Buffer, uniqueness = True)
 
 		return Settings
 

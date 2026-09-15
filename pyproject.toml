@@ -1,3 +1,7 @@
+[build-system]
+requires = ["uv-build>=0.12.14,<0.13.0"]
+build-backend = "uv_build"
+
 [project]
 name = "melon"
 version = "1.0.0-rc.5"
@@ -9,8 +13,7 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
 	"beautifulsoup4",
-	"deepmerge",
-	"dublib>=0.30.3",
+	"dublib>=0.30.4",
 	"dulwich>=1.2.6",
 	"EbookLib",
 	"imagehash",
@@ -28,10 +31,6 @@ dev = ["ruff", "ty"]
 melon = "melon:main"
 pxm = "melon:main"
 urun = "melon:main"
-
-[build-system]
-requires = ["uv-build>=0.12.10,<0.13.0"]
-build-backend = "uv_build"
 
 [tool.ruff.lint]
 select = ["A", "ARG", "C", "E", "F", "I", "TC"]
